@@ -1,0 +1,247 @@
+definitions:
+  web.ApplicationKey:
+    properties:
+      appCert:
+        type: string
+      appPubKey:
+        type: string
+    type: object
+  web.Attestation:
+    properties:
+      attestationVer:
+        type: string
+      deviceCert:
+        type: string
+      signature:
+        type: string
+    type: object
+  web.ErrorResponse:
+    properties:
+      error:
+        type: string
+    type: object
+  web.QuotaResponse:
+    properties:
+      quota:
+        type: integer
+      used:
+        type: integer
+    type: object
+  web.ReadKvResponse:
+    properties:
+      present:
+        type: boolean
+      protected:
+        type: boolean
+      protector:
+        type: string
+      provisioned:
+        type: boolean
+      provisioner:
+        type: string
+      value:
+        type: string
+    type: object
+  web.SignResponse:
+    properties:
+      pubKey:
+        type: string
+      signature:
+        type: string
+    type: object
+  web.WriteKvResponse:
+    properties:
+      success:
+        type: boolean
+    type: object
+info:
+  contact: {}
+paths:
+  /api/v1/attestation/appkey:
+    get:
+      consumes:
+      - application/json
+      description: Get app derived key for current (simulated) tee version
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/web.ApplicationKey'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
+      summary: Get app derived key for current (simulated) tee version
+      tags:
+      - attestation
+  /api/v1/attestation/sign:
+    get:
+      consumes:
+      - application/json
+      description: Sign with app derived key for current (simulated) tee version
+      parameters:
+      - description: Data to be signed
+        in: body
+        name: data
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/web.SignResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
+      summary: Sign with app derived key for current (simulated) tee version
+      tags:
+      - attestation
+  /api/v1/attestation/version:
+    get:
+      consumes:
+      - application/json
+      description: Get version attestation for current (simulated) tee version
+      parameters:
+      - description: Remote requester's nonce and signature, serialized as hex(64b
+          nonce || 64b pubKey || 65b signature), in which signature is the signature
+          of nonce || pubKey
+        in: query
+        name: attestation
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/web.Attestation'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
+      summary: Get version attestation for current (simulated) tee version
+      tags:
+      - attestation
+  /delete:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a key-value pair
+      parameters:
+      - description: Key
+        in: query
+        name: key
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/web.WriteKvResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
+      summary: Delete a key-value pair
+      tags:
+      - kv
+  /quota:
+    get:
+      description: Get the quota of the current application, return the number of
+        keys that can be written
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/web.QuotaResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
+      summary: Get the quota of the current application
+      tags:
+      - kv
+  /read:
+    get:
+      consumes:
+      - application/json
+      description: Read a key-value pair, If the target key is protected, the protector
+        must be provided.
+      parameters:
+      - description: Key
+        in: query
+        name: key
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/web.ReadKvResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
+      summary: Read a key-value pair
+      tags:
+      - kv
+  /write:
+    post:
+      consumes:
+      - application/json
+      description: Write a key-value pair, If Provision is provided, the remote provision
+        information will be added, and only the provisioner can write it, If Protected
+        is provided, the target key will be protected, and only the protector can
+        read it.
+      parameters:
+      - description: Key
+        in: body
+        name: key
+        required: true
+        schema:
+          type: string
+      - description: Value
+        in: body
+        name: value
+        required: true
+        schema:
+          type: string
+      - description: Remote Provision Signature, Should be pubKey(64b) || sig(appKey(64byte)
+          || keccak256(key) ||  keccak256(value)))
+        in: body
+        name: provision
+        schema:
+          type: string
+      - description: Protect Target Key
+        in: body
+        name: protected
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/web.WriteKvResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
+      summary: Write a key-value pair
+      tags:
+      - kv
+swagger: "2.0"

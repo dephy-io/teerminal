@@ -61,12 +61,12 @@ type QuotaResponse struct {
 // @Summary Write a key-value pair
 // @Description Write a key-value pair, If Provision is provided, the remote provision information will be added, and only the provisioner can write it, If Protected is provided, the target key will be protected, and only the protector can read it.
 // @Tags kv
-// @Accept json
-// @Produce json
-// @Param key json string true "Key"
-// @Param value json string true "Value"
-// @Param provision string false "Remote Provision Signature, Should be pubKey(64b) || sig(appKey(64byte) || keccak256(key) ||  keccak256(value)))"
-// @Param protected string false "Protect Target Key"
+// @Accept application/json
+// @Produce application/json
+// @Param key body string true "Key"
+// @Param value body string true "Value"
+// @Param provision body string false "Remote Provision Signature, Should be pubKey(64b) || sig(appKey(64byte) || keccak256(key) ||  keccak256(value)))"
+// @Param protected body string false "Protect Target Key"
 // @Success 200 {object} WriteKvResponse
 // @Failure 400 {object} ErrorResponse
 // @Router /write [post]
@@ -146,8 +146,8 @@ func HandleWriteKv(c *gin.Context) {
 // @Summary Read a key-value pair
 // @Description Read a key-value pair, If the target key is protected, the protector must be provided.
 // @Tags kv
-// @Accept json
-// @Produce json
+// @Accept application/json
+// @Produce application/json
 // @Param key query string true "Key"
 // @Success 200 {object} ReadKvResponse
 // @Failure 400 {object} ErrorResponse
@@ -181,8 +181,8 @@ func HandleReadKv(c *gin.Context) {
 // @Summary Delete a key-value pair
 // @Description Delete a key-value pair
 // @Tags kv
-// @Accept json
-// @Produce json
+// @Accept application/json
+// @Produce application/json
 // @Param key query string true "Key"
 // @Success 200 {object} WriteKvResponse
 // @Failure 400 {object} ErrorResponse
@@ -210,8 +210,7 @@ func HandleDeleteKv(c *gin.Context) {
 // @Summary Get the quota of the current application
 // @Description Get the quota of the current application, return the number of keys that can be written
 // @Tags kv
-// @Accept none
-// @Produce json
+// @Produce application/json
 // @Success 200 {object} QuotaResponse
 // @Failure 400 {object} ErrorResponse
 // @Router /quota [get]

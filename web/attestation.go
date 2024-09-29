@@ -45,8 +45,8 @@ type SignResponse struct {
 // @Summary Get version attestation for current (simulated) tee version
 // @Description Get version attestation for current (simulated) tee version
 // @Tags attestation
-// @Accept json
-// @Produce json
+// @Accept application/json
+// @Produce application/json
 // @Param attestation query string true "Remote requester's nonce and signature, serialized as hex(64b nonce || 64b pubKey || 65b signature), in which signature is the signature of nonce || pubKey"
 // @Success 200 {object} Attestation
 // @Failure 400 {object} ErrorResponse
@@ -109,8 +109,8 @@ func HandleGetVersionAttestation(c *gin.Context) {
 // @Summary Get app derived key for current (simulated) tee version
 // @Description Get app derived key for current (simulated) tee version
 // @Tags attestation
-// @Accept json
-// @Produce json
+// @Accept application/json
+// @Produce application/json
 // @Success 200 {object} ApplicationKey
 // @Failure 400 {object} ErrorResponse
 // @Router /api/v1/attestation/appkey [get]
@@ -141,9 +141,9 @@ func HandleGetAppDerivedKey(c *gin.Context) {
 // @Summary Sign with app derived key for current (simulated) tee version
 // @Description Sign with app derived key for current (simulated) tee version
 // @Tags attestation
-// @Accept json
-// @Produce json
-// @Param data json string true "Data to be signed"
+// @Accept application/json
+// @Produce application/json
+// @Param data body string true "Data to be signed"
 // @Success 200 {object} SignResponse
 // @Failure 400 {object} ErrorResponse
 // @Router /api/v1/attestation/sign [get]
