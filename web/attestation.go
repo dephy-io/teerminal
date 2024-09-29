@@ -33,7 +33,7 @@ type ApplicationKey struct {
 }
 
 type SignRequest struct {
-	Data string `json:"data"`
+	Data string `json:"data"` // Data is the data to be signed
 }
 
 type SignResponse struct {
@@ -143,10 +143,10 @@ func HandleGetAppDerivedKey(c *gin.Context) {
 // @Tags attestation
 // @Accept application/json
 // @Produce application/json
-// @Param data body string true "Data to be signed"
+// @Param data body SignRequest true "Data to be signed"
 // @Success 200 {object} SignResponse
 // @Failure 400 {object} ErrorResponse
-// @Router /api/v1/attestation/sign [get]
+// @Router /api/v1/attestation/sign [post]
 func HandleSignWithAppDerivedKey(c *gin.Context) {
 	appKey := encryption.DerivePrivateKey(config.GetRootKey(), []byte(config.GetConfig().AppName))
 	appPublicKey := encryption.GetPublicKey(appKey)

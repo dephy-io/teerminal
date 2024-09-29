@@ -24,11 +24,11 @@ func RegisterKvRoutes(r *gin.Engine) {
 }
 
 type WriteKvRequest struct {
-	Key       string `json:"key"`
-	Value     string `json:"value"`
-	Provision string `json:"provision"`
-	Protected string `json:"protected"`
-	Overwrite bool   `json:"overwrite"`
+	Key       string `json:"key"`       // Key is the key to write
+	Value     string `json:"value"`     // Value is the value to write
+	Provision string `json:"provision"` // Provision is the provision information, leave empty if not needed
+	Protected string `json:"protected"` // Protected is the protector information, leave empty if not needed
+	Overwrite bool   `json:"overwrite"` // Overwrite is the flag to overwrite the existing key, default is false
 }
 
 type DeleteKvRequest struct {
@@ -40,12 +40,12 @@ type WriteKvResponse struct {
 }
 
 type ReadKvResponse struct {
-	Present     bool   `json:"present"`
-	Value       string `json:"value"`
-	Provisioned bool   `json:"provisioned"`
-	Protected   bool   `json:"protected"`
-	Provisioner string `json:"provisioner,omitempty"`
-	Protector   string `json:"protector,omitempty"`
+	Present     bool   `json:"present"`               // Present is the flag to indicate if the key exists
+	Value       string `json:"value"`                 // Value is the value of the key
+	Provisioned bool   `json:"provisioned"`           // Provisioned is the flag to indicate if the key is provisioned
+	Protected   bool   `json:"protected"`             // Protected is the flag to indicate if the key is protected
+	Provisioner string `json:"provisioner,omitempty"` // Provisioner is the provisioner of the key, if any
+	Protector   string `json:"protector,omitempty"`   // Protector is the protector of the key, if any
 }
 
 type DeleteKvResponse struct {
@@ -63,13 +63,10 @@ type QuotaResponse struct {
 // @Tags kv
 // @Accept application/json
 // @Produce application/json
-// @Param key body string true "Key"
-// @Param value body string true "Value"
-// @Param provision body string false "Remote Provision Signature, Should be pubKey(64b) || sig(appKey(64byte) || keccak256(key) ||  keccak256(value)))"
-// @Param protected body string false "Protect Target Key"
+// @Param keyInfo body WriteKvRequest true "Key"
 // @Success 200 {object} WriteKvResponse
 // @Failure 400 {object} ErrorResponse
-// @Router /write [post]
+// @Router /api/v1/kv/write [post]
 func HandleWriteKv(c *gin.Context) {
 	var req WriteKvRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -151,7 +148,7 @@ func HandleWriteKv(c *gin.Context) {
 // @Param key query string true "Key"
 // @Success 200 {object} ReadKvResponse
 // @Failure 400 {object} ErrorResponse
-// @Router /read [get]
+// @Router /api/v1/kv/read [get]
 func HandleReadKv(c *gin.Context) {
 	key := c.Query("key")
 	if key == "" {
@@ -183,10 +180,10 @@ func HandleReadKv(c *gin.Context) {
 // @Tags kv
 // @Accept application/json
 // @Produce application/json
-// @Param key query string true "Key"
+// @Param DeleteRequest body DeleteKvRequest true "Request to delete"
 // @Success 200 {object} WriteKvResponse
 // @Failure 400 {object} ErrorResponse
-// @Router /delete [delete]
+// @Router /api/v1/kv/delete [delete]
 func HandleDeleteKv(c *gin.Context) {
 	req := DeleteKvRequest{}
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -213,7 +210,7 @@ func HandleDeleteKv(c *gin.Context) {
 // @Produce application/json
 // @Success 200 {object} QuotaResponse
 // @Failure 400 {object} ErrorResponse
-// @Router /quota [get]
+// @Router /api/v1/kv/quota [get]
 func HandleQuota(c *gin.Context) {
 	used := kv.Length()
 	quota := constants.MaxKvEntries

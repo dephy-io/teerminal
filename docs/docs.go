@@ -45,7 +45,7 @@ const docTemplate = `{
             }
         },
         "/api/v1/attestation/sign": {
-            "get": {
+            "post": {
                 "description": "Sign with app derived key for current (simulated) tee version",
                 "consumes": [
                     "application/json"
@@ -64,7 +64,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/web.SignRequest"
                         }
                     }
                 ],
@@ -122,7 +122,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/delete": {
+        "/api/v1/kv/delete": {
             "delete": {
                 "description": "Delete a key-value pair",
                 "consumes": [
@@ -137,11 +137,13 @@ const docTemplate = `{
                 "summary": "Delete a key-value pair",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "Key",
-                        "name": "key",
-                        "in": "query",
-                        "required": true
+                        "description": "Request to delete",
+                        "name": "DeleteRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/web.DeleteKvRequest"
+                        }
                     }
                 ],
                 "responses": {
@@ -160,7 +162,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/quota": {
+        "/api/v1/kv/quota": {
             "get": {
                 "description": "Get the quota of the current application, return the number of keys that can be written",
                 "produces": [
@@ -186,7 +188,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/read": {
+        "/api/v1/kv/read": {
             "get": {
                 "description": "Read a key-value pair, If the target key is protected, the protector must be provided.",
                 "consumes": [
@@ -224,7 +226,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/write": {
+        "/api/v1/kv/write": {
             "post": {
                 "description": "Write a key-value pair, If Provision is provided, the remote provision information will be added, and only the provisioner can write it, If Protected is provided, the target key will be protected, and only the protector can read it.",
                 "consumes": [
@@ -240,36 +242,11 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "description": "Key",
-                        "name": "key",
+                        "name": "keyInfo",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "description": "Value",
-                        "name": "value",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "description": "Remote Provision Signature, Should be pubKey(64b) || sig(appKey(64byte) || keccak256(key) ||  keccak256(value)))",
-                        "name": "provision",
-                        "in": "body",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "description": "Protect Target Key",
-                        "name": "protected",
-                        "in": "body",
-                        "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/web.WriteKvRequest"
                         }
                     }
                 ],
@@ -316,6 +293,14 @@ const docTemplate = `{
                 }
             }
         },
+        "web.DeleteKvRequest": {
+            "type": "object",
+            "properties": {
+                "key": {
+                    "type": "string"
+                }
+            }
+        },
         "web.ErrorResponse": {
             "type": "object",
             "properties": {
@@ -339,21 +324,36 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "present": {
+                    "description": "Present is the flag to indicate if the key exists",
                     "type": "boolean"
                 },
                 "protected": {
+                    "description": "Protected is the flag to indicate if the key is protected",
                     "type": "boolean"
                 },
                 "protector": {
+                    "description": "Protector is the protector of the key, if any",
                     "type": "string"
                 },
                 "provisioned": {
+                    "description": "Provisioned is the flag to indicate if the key is provisioned",
                     "type": "boolean"
                 },
                 "provisioner": {
+                    "description": "Provisioner is the provisioner of the key, if any",
                     "type": "string"
                 },
                 "value": {
+                    "description": "Value is the value of the key",
+                    "type": "string"
+                }
+            }
+        },
+        "web.SignRequest": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "description": "Data is the data to be signed",
                     "type": "string"
                 }
             }
@@ -365,6 +365,31 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "signature": {
+                    "type": "string"
+                }
+            }
+        },
+        "web.WriteKvRequest": {
+            "type": "object",
+            "properties": {
+                "key": {
+                    "description": "Key is the key to write",
+                    "type": "string"
+                },
+                "overwrite": {
+                    "description": "Overwrite is the flag to overwrite the existing key, default is false",
+                    "type": "boolean"
+                },
+                "protected": {
+                    "description": "Protected is the protector information, leave empty if not needed",
+                    "type": "string"
+                },
+                "provision": {
+                    "description": "Provision is the provision information, leave empty if not needed",
+                    "type": "string"
+                },
+                "value": {
+                    "description": "Value is the value to write",
                     "type": "string"
                 }
             }
