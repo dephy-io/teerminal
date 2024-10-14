@@ -1,13 +1,16 @@
 package web
 
 import (
+	"encoding/binary"
 	"encoding/hex"
 	"fmt"
+	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/gin-gonic/gin"
 	"strings"
 	"teerminal/config"
 	"teerminal/constants"
 	"teerminal/service/encryption"
+	"time"
 )
 
 // @BasePath /api/v1/attestation
@@ -15,6 +18,7 @@ import (
 func RegisterAttestationRoutes(router *gin.Engine) {
 	attestation := router.Group("/api/v1/attestation")
 	{
+		attestation.GET("/enrollment", HandleGetDeviceEnrollment)
 		attestation.GET("/version", HandleGetVersionAttestation)
 		attestation.GET("/appkey", HandleGetAppDerivedKey)
 		attestation.POST("/sign", HandleSignWithAppDerivedKey)
@@ -32,6 +36,12 @@ type ApplicationKey struct {
 	PubKey string `json:"appPubKey"`
 }
 
+type Enrollment struct {
+	DeviceKey string `json:"deviceKey"`
+	Deadline  int64  `json:"deadline"`
+	Signature string `json:"signature"`
+}
+
 type SignRequest struct {
 	Data string `json:"data"` // Data is the data to be signed
 }
@@ -39,6 +49,39 @@ type SignRequest struct {
 type SignResponse struct {
 	PubKey    string `json:"pubKey"`
 	Signature string `json:"signature"`
+}
+
+// HandleGetDeviceEnrollment godoc
+// @Summary Get device enrollment key for current (simulated) tee version
+// @Description Get device enrollment key for current (simulated) tee version
+// @Description Please see also the DePhy evm sdk.
+// @Tags attestation
+// @Accept application/json
+// @Produce application/json
+// @Success 200 {object} Enrollment
+// @Router /api/v1/attestation/enrollment [get]
+func HandleGetDeviceEnrollment(c *gin.Context) {
+	// Deadline set to be 6hrs from now
+	deadline := time.Now().Add(6 * time.Hour).Unix()
+	// Pad to 256bit(32byte) length with 0s as prefix
+	deadlineBytes := binary.BigEndian.AppendUint64([]byte{}, uint64(deadline))
+	length := len(deadlineBytes)
+	prefix := make([]byte, 32-length)
+	deadlineBytes = append(prefix, deadlineBytes...)
+	// eth keccak256 hash of the deadline
+	msgHash := crypto.Keccak256(deadlineBytes)
+	msgSignPayload := append([]byte(constants.DeviceEnrollmentKey), msgHash...)
+	// Sign the payload with the root key
+	deviceRoot := encryption.DerivePrivateKey(config.GetRootKey(), []byte(constants.DeviceRootKey))
+	deviceRootPublic := encryption.GetPublicKey(deviceRoot)
+	signature, _ := encryption.Sign(deviceRoot, msgSignPayload)
+	// Return the enrollment key and deadline as hex
+	c.JSON(200, Enrollment{
+		DeviceKey: fmt.Sprintf("%x", deviceRootPublic),
+		Deadline:  deadline,
+		Signature: fmt.Sprintf("%x", signature),
+	})
+
 }
 
 // HandleGetVersionAttestation godoc

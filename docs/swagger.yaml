@@ -20,6 +20,15 @@ definitions:
       key:
         type: string
     type: object
+  web.Enrollment:
+    properties:
+      deadline:
+        type: integer
+      deviceKey:
+        type: string
+      signature:
+        type: string
+    type: object
   web.ErrorResponse:
     properties:
       error:
@@ -110,6 +119,23 @@ paths:
           schema:
             $ref: '#/definitions/web.ErrorResponse'
       summary: Get app derived key for current (simulated) tee version
+      tags:
+      - attestation
+  /api/v1/attestation/enrollment:
+    get:
+      consumes:
+      - application/json
+      description: |-
+        Get device enrollment key for current (simulated) tee version
+        Please see also the DePhy evm sdk.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/web.Enrollment'
+      summary: Get device enrollment key for current (simulated) tee version
       tags:
       - attestation
   /api/v1/attestation/sign:

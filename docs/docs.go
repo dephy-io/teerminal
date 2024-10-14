@@ -44,6 +44,29 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/attestation/enrollment": {
+            "get": {
+                "description": "Get device enrollment key for current (simulated) tee version\nPlease see also the DePhy evm sdk.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "attestation"
+                ],
+                "summary": "Get device enrollment key for current (simulated) tee version",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/web.Enrollment"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/attestation/sign": {
             "post": {
                 "description": "Sign with app derived key for current (simulated) tee version",
@@ -297,6 +320,20 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "key": {
+                    "type": "string"
+                }
+            }
+        },
+        "web.Enrollment": {
+            "type": "object",
+            "properties": {
+                "deadline": {
+                    "type": "integer"
+                },
+                "deviceKey": {
+                    "type": "string"
+                },
+                "signature": {
                     "type": "string"
                 }
             }
