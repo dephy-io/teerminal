@@ -1,0 +1,7 @@
+{
+    "port": "4100",
+    "version": "0.0.1-emulator",
+    "vendor_root": "dbbe0cd0b4c7bc4ab34829c96f35bb0011d06dc3bdf0b900401a71a8f7c4c471",
+    "root_key": "cd2f10b3d7d306a27199ccf51868c1b0859f824b6fab53710f06a092ae40226f",
+    "app_name": "EmulatorDefault"
+}
