@@ -3,11 +3,12 @@ package web
 import (
 	"encoding/hex"
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"strings"
 	"teerminal/config"
 	"teerminal/constants"
 	"teerminal/service/encryption"
+
+	"github.com/gin-gonic/gin"
 )
 
 // @BasePath /api/v1/attestation
@@ -23,7 +24,7 @@ func RegisterAttestationRoutes(router *gin.Engine) {
 type Attestation struct {
 	Cert           string `json:"deviceCert"`
 	AttestationVer string `json:"attestationVer"`
-	TeePlatformVer uint64 `json:"teePlatformVer"`
+	TeePlatformVer uint32 `json:"teePlatformVer"`
 	Signature      string `json:"signature"`
 }
 

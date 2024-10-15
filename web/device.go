@@ -4,12 +4,13 @@ import (
 	"encoding/binary"
 	"encoding/hex"
 	"fmt"
-	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/gin-gonic/gin"
 	"strings"
 	"teerminal/config"
 	"teerminal/constants"
 	"teerminal/service/encryption"
+
+	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/gin-gonic/gin"
 )
 
 type Enrollment struct {
@@ -79,7 +80,7 @@ func HandleGetVersionAttestation(c *gin.Context) {
 	var signable []byte
 	signable = append(signable, nonce...)
 	signable = append(signable, pubKey...)
-	platformVersionBytes := binary.BigEndian.AppendUint64([]byte{}, constants.TeePlatformVersion)
+	platformVersionBytes := binary.BigEndian.AppendUint32([]byte{}, constants.TeePlatformVersion)
 	signable = append(signable, platformVersionBytes...)
 	signable = append(signable, []byte(version)...)
 	deviceRoot := encryption.DerivePrivateKey(config.GetRootKey(), []byte(constants.DeviceRootKey))
