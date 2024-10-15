@@ -20,10 +20,17 @@ definitions:
       key:
         type: string
     type: object
+  web.DeviceKey:
+    properties:
+      deviceCert:
+        type: string
+      devicePubKey:
+        type: string
+    type: object
   web.Enrollment:
     properties:
       deadline:
-        type: integer
+        type: string
       deviceKey:
         type: string
       signature:
@@ -121,32 +128,17 @@ paths:
       summary: Get app derived key for current (simulated) tee version
       tags:
       - attestation
-  /api/v1/attestation/enrollment:
-    get:
+  /api/v1/attestation/sign:
+    post:
       consumes:
       - application/json
       description: |-
         Get device enrollment key for current (simulated) tee version
         Please see also the DePhy evm sdk.
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/web.Enrollment'
-      summary: Get device enrollment key for current (simulated) tee version
-      tags:
-      - attestation
-  /api/v1/attestation/sign:
-    post:
-      consumes:
-      - application/json
-      description: Sign with app derived key for current (simulated) tee version
       parameters:
       - description: Data to be signed
         in: body
-        name: data
+        name: signRequest
         required: true
         schema:
           $ref: '#/definitions/web.SignRequest'
@@ -156,15 +148,26 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/web.SignResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/web.ErrorResponse'
-      summary: Sign with app derived key for current (simulated) tee version
+            $ref: '#/definitions/web.Enrollment'
+      summary: Get device enrollment key for current (simulated) tee version
       tags:
-      - attestation
-  /api/v1/attestation/version:
+      - device
+  /api/v1/device/key:
+    get:
+      consumes:
+      - application/json
+      description: Get device key for current (simulated) tee version
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/web.DeviceKey'
+      summary: Get device key for current (simulated) tee version
+      tags:
+      - device
+  /api/v1/device/version:
     get:
       consumes:
       - application/json
@@ -190,7 +193,7 @@ paths:
             $ref: '#/definitions/web.ErrorResponse'
       summary: Get version attestation for current (simulated) tee version
       tags:
-      - attestation
+      - device
   /api/v1/kv/delete:
     delete:
       consumes:

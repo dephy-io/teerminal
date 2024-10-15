@@ -44,8 +44,8 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/attestation/enrollment": {
-            "get": {
+        "/api/v1/attestation/sign": {
+            "post": {
                 "description": "Get device enrollment key for current (simulated) tee version\nPlease see also the DePhy evm sdk.",
                 "consumes": [
                     "application/json"
@@ -54,36 +54,13 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "attestation"
+                    "device"
                 ],
                 "summary": "Get device enrollment key for current (simulated) tee version",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/web.Enrollment"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/attestation/sign": {
-            "post": {
-                "description": "Sign with app derived key for current (simulated) tee version",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "attestation"
-                ],
-                "summary": "Sign with app derived key for current (simulated) tee version",
                 "parameters": [
                     {
                         "description": "Data to be signed",
-                        "name": "data",
+                        "name": "signRequest",
                         "in": "body",
                         "required": true,
                         "schema": {
@@ -95,19 +72,36 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/web.SignResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/web.ErrorResponse"
+                            "$ref": "#/definitions/web.Enrollment"
                         }
                     }
                 }
             }
         },
-        "/api/v1/attestation/version": {
+        "/api/v1/device/key": {
+            "get": {
+                "description": "Get device key for current (simulated) tee version",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "device"
+                ],
+                "summary": "Get device key for current (simulated) tee version",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/web.DeviceKey"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/device/version": {
             "get": {
                 "description": "Get version attestation for current (simulated) tee version",
                 "consumes": [
@@ -117,7 +111,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "attestation"
+                    "device"
                 ],
                 "summary": "Get version attestation for current (simulated) tee version",
                 "parameters": [
@@ -324,11 +318,22 @@ const docTemplate = `{
                 }
             }
         },
+        "web.DeviceKey": {
+            "type": "object",
+            "properties": {
+                "deviceCert": {
+                    "type": "string"
+                },
+                "devicePubKey": {
+                    "type": "string"
+                }
+            }
+        },
         "web.Enrollment": {
             "type": "object",
             "properties": {
                 "deadline": {
-                    "type": "integer"
+                    "type": "string"
                 },
                 "deviceKey": {
                     "type": "string"
