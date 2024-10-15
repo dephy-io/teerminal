@@ -46,6 +46,69 @@ const docTemplate = `{
         },
         "/api/v1/attestation/sign": {
             "post": {
+                "description": "Sign with app derived key for current (simulated) tee version",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "attestation"
+                ],
+                "summary": "Sign with app derived key for current (simulated) tee version",
+                "parameters": [
+                    {
+                        "description": "Data to be signed",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/web.SignRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/web.SignResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/web.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/device/key": {
+            "get": {
+                "description": "Get device key for current (simulated) tee version",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "device"
+                ],
+                "summary": "Get device key for current (simulated) tee version",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/web.DeviceKey"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/device/sign": {
+            "post": {
                 "description": "Get device enrollment key for current (simulated) tee version\nPlease see also the DePhy evm sdk.",
                 "consumes": [
                     "application/json"
@@ -78,29 +141,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/device/key": {
-            "get": {
-                "description": "Get device key for current (simulated) tee version",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "device"
-                ],
-                "summary": "Get device key for current (simulated) tee version",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/web.DeviceKey"
-                        }
-                    }
-                }
-            }
-        },
         "/api/v1/device/version": {
             "get": {
                 "description": "Get version attestation for current (simulated) tee version",
@@ -117,10 +157,9 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Remote requester's nonce and signature, serialized as hex(64b nonce || 64b pubKey || 65b signature), in which signature is the signature of nonce || pubKey",
+                        "description": "Remote requester's nonce and signature, serialized as hex(64b nonce || 64b pubKey || 65b signature), in which signature is the signature of nonce || pubKey, if signature not provided, omit signature",
                         "name": "attestation",
-                        "in": "query",
-                        "required": true
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -309,7 +348,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "teePlatformVer": {
-                    "type": "string"
+                    "type": "integer"
                 }
             }
         },

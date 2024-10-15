@@ -1,6 +1,7 @@
 package web
 
 import (
+	"encoding/binary"
 	"encoding/hex"
 	"fmt"
 	"github.com/ethereum/go-ethereum/crypto"
@@ -37,7 +38,7 @@ func RegisterDeviceRoutes(router *gin.Engine) {
 // @Tags device
 // @Accept application/json
 // @Produce application/json
-// @Param attestation query string true "Remote requester's nonce and signature, serialized as hex(64b nonce || 64b pubKey || 65b signature), in which signature is the signature of nonce || pubKey"
+// @Param attestation query string false "Remote requester's nonce and signature, serialized as hex(64b nonce || 64b pubKey || 65b signature), in which signature is the signature of nonce || pubKey, if signature not provided, omit signature"
 // @Success 200 {object} Attestation
 // @Failure 400 {object} ErrorResponse
 // @Router /api/v1/device/version [get]
@@ -45,7 +46,7 @@ func HandleGetVersionAttestation(c *gin.Context) {
 	// First check if attestation is provided
 	attestation := c.Query("attestation")
 	if attestation == "" {
-		c.JSON(400, ErrorResponse{Error: constants.MsgErrorMissingRemoteAttestation})
+		c.JSON(200, Attestation{AttestationVer: config.GetConfig().Version, TeePlatformVer: constants.TeePlatformVersion})
 		c.Next()
 		return
 	}
@@ -78,7 +79,8 @@ func HandleGetVersionAttestation(c *gin.Context) {
 	var signable []byte
 	signable = append(signable, nonce...)
 	signable = append(signable, pubKey...)
-	signable = append(signable, constants.TeePlatformVersion...)
+	platformVersionBytes := binary.BigEndian.AppendUint64([]byte{}, constants.TeePlatformVersion)
+	signable = append(signable, platformVersionBytes...)
 	signable = append(signable, []byte(version)...)
 	deviceRoot := encryption.DerivePrivateKey(config.GetRootKey(), []byte(constants.DeviceRootKey))
 	deviceCert := encryption.GetDeviceRootCert()
@@ -92,7 +94,7 @@ func HandleGetVersionAttestation(c *gin.Context) {
 	c.JSON(200, Attestation{
 		Cert:           fmt.Sprintf("%x", cert),
 		AttestationVer: version,
-		TeePlatformVer: fmt.Sprintf("%x", constants.TeePlatformVersion),
+		TeePlatformVer: constants.TeePlatformVersion,
 		Signature:      fmt.Sprintf("%x", signature),
 	})
 }
@@ -106,7 +108,7 @@ func HandleGetVersionAttestation(c *gin.Context) {
 // @Param signRequest body SignRequest true "Data to be signed"
 // @Produce application/json
 // @Success 200 {object} Enrollment
-// @Router /api/v1/attestation/sign [post]
+// @Router /api/v1/device/sign [post]
 func HandleDeviceSign(c *gin.Context) {
 	req := SignRequest{}
 	if err := c.ShouldBindJSON(&req); err != nil {

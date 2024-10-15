@@ -15,7 +15,7 @@ definitions:
       signature:
         type: string
       teePlatformVer:
-        type: string
+        type: integer
     type: object
   web.DeleteKvRequest:
     properties:
@@ -134,6 +134,47 @@ paths:
     post:
       consumes:
       - application/json
+      description: Sign with app derived key for current (simulated) tee version
+      parameters:
+      - description: Data to be signed
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/web.SignRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/web.SignResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
+      summary: Sign with app derived key for current (simulated) tee version
+      tags:
+      - attestation
+  /api/v1/device/key:
+    get:
+      consumes:
+      - application/json
+      description: Get device key for current (simulated) tee version
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/web.DeviceKey'
+      summary: Get device key for current (simulated) tee version
+      tags:
+      - device
+  /api/v1/device/sign:
+    post:
+      consumes:
+      - application/json
       description: |-
         Get device enrollment key for current (simulated) tee version
         Please see also the DePhy evm sdk.
@@ -154,21 +195,6 @@ paths:
       summary: Get device enrollment key for current (simulated) tee version
       tags:
       - device
-  /api/v1/device/key:
-    get:
-      consumes:
-      - application/json
-      description: Get device key for current (simulated) tee version
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/web.DeviceKey'
-      summary: Get device key for current (simulated) tee version
-      tags:
-      - device
   /api/v1/device/version:
     get:
       consumes:
@@ -177,10 +203,9 @@ paths:
       parameters:
       - description: Remote requester's nonce and signature, serialized as hex(64b
           nonce || 64b pubKey || 65b signature), in which signature is the signature
-          of nonce || pubKey
+          of nonce || pubKey, if signature not provided, omit signature
         in: query
         name: attestation
-        required: true
         type: string
       produces:
       - application/json
