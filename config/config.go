@@ -9,11 +9,12 @@ import (
 )
 
 type Config struct {
-	Port       string `json:"port" mapstructure:"port"`
-	Version    string `json:"version" mapstructure:"version"`
-	VendorRoot string `json:"vendor_root" mapstructure:"vendor_root"` // VendorRoot is the key for signing device identity
-	RootKey    string `json:"root_key" mapstructure:"root_key"`
-	AppName    string `json:"app_name" mapstructure:"app_name"` // AppName is the name of the application
+	Port               string `json:"port" mapstructure:"port"`
+	Version            string `json:"version" mapstructure:"version"`
+	TeePlatformVersion uint32 `json:"teePlatformVersion" mapstructure:"teePlatformVersion"`
+	VendorRoot         string `json:"vendorRoot" mapstructure:"vendorRoot"` // VendorRoot is the key for signing device identity
+	RootKey            string `json:"rootKey" mapstructure:"rootKey"`
+	AppName            string `json:"appName" mapstructure:"appName"` // AppName is the name of the application
 }
 
 var config *Config

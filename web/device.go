@@ -47,7 +47,7 @@ func HandleGetVersionAttestation(c *gin.Context) {
 	// First check if attestation is provided
 	attestation := c.Query("attestation")
 	if attestation == "" {
-		c.JSON(200, Attestation{AttestationVer: config.GetConfig().Version, TeePlatformVer: constants.TeePlatformVersion})
+		c.JSON(200, Attestation{AttestationVer: config.GetConfig().Version, TeePlatformVer: config.GetConfig().TeePlatformVersion})
 		c.Next()
 		return
 	}
@@ -80,7 +80,7 @@ func HandleGetVersionAttestation(c *gin.Context) {
 	var signable []byte
 	signable = append(signable, nonce...)
 	signable = append(signable, pubKey...)
-	platformVersionBytes := binary.BigEndian.AppendUint32([]byte{}, constants.TeePlatformVersion)
+	platformVersionBytes := binary.BigEndian.AppendUint32([]byte{}, config.GetConfig().TeePlatformVersion)
 	signable = append(signable, platformVersionBytes...)
 	signable = append(signable, []byte(version)...)
 	deviceRoot := encryption.DerivePrivateKey(config.GetRootKey(), []byte(constants.DeviceRootKey))
@@ -95,7 +95,7 @@ func HandleGetVersionAttestation(c *gin.Context) {
 	c.JSON(200, Attestation{
 		Cert:           fmt.Sprintf("%x", cert),
 		AttestationVer: version,
-		TeePlatformVer: constants.TeePlatformVersion,
+		TeePlatformVer: config.GetConfig().TeePlatformVersion,
 		Signature:      fmt.Sprintf("%x", signature),
 	})
 }
