@@ -307,6 +307,9 @@ const docTemplate = `{
                 },
                 "signature": {
                     "type": "string"
+                },
+                "teePlatformVer": {
+                    "type": "string"
                 }
             }
         },

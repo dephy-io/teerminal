@@ -14,6 +14,8 @@ definitions:
         type: string
       signature:
         type: string
+      teePlatformVer:
+        type: string
     type: object
   web.DeleteKvRequest:
     properties:

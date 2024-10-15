@@ -21,6 +21,7 @@ func RegisterAttestationRoutes(router *gin.Engine) {
 type Attestation struct {
 	Cert           string `json:"deviceCert"`
 	AttestationVer string `json:"attestationVer"`
+	TeePlatformVer string `json:"teePlatformVer"`
 	Signature      string `json:"signature"`
 }
 

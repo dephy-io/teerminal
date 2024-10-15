@@ -73,11 +73,12 @@ func HandleGetVersionAttestation(c *gin.Context) {
 		c.Next()
 		return
 	}
-	// Then sign (nonce || pubKey || version) with the local private key
+	// Then sign (nonce || pubKey || teePlatformVersion || version) with the local private key
 	version := config.GetConfig().Version
 	var signable []byte
 	signable = append(signable, nonce...)
 	signable = append(signable, pubKey...)
+	signable = append(signable, constants.TeePlatformVersion...)
 	signable = append(signable, []byte(version)...)
 	deviceRoot := encryption.DerivePrivateKey(config.GetRootKey(), []byte(constants.DeviceRootKey))
 	deviceCert := encryption.GetDeviceRootCert()
@@ -91,6 +92,7 @@ func HandleGetVersionAttestation(c *gin.Context) {
 	c.JSON(200, Attestation{
 		Cert:           fmt.Sprintf("%x", cert),
 		AttestationVer: version,
+		TeePlatformVer: fmt.Sprintf("%x", constants.TeePlatformVersion),
 		Signature:      fmt.Sprintf("%x", signature),
 	})
 }
