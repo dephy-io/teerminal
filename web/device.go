@@ -114,7 +114,10 @@ func HandleDeviceSign(c *gin.Context) {
 		c.Next()
 		return
 	}
-	data := []byte(req.Data)
+	data, err := hex.DecodeString(strings.TrimPrefix(req.Data, "0x"))
+	if err != nil {
+		c.JSON(400, ErrorResponse{Error: constants.MsgErrorFailedDecodeMessage})
+	}
 	// eth keccak256 hash of the deadline
 	msgHash := crypto.Keccak256(data)
 	msgSignPayload := append([]byte(constants.DeviceEnrollmentKey), msgHash...)

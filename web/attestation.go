@@ -1,8 +1,10 @@
 package web
 
 import (
+	"encoding/hex"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"strings"
 	"teerminal/config"
 	"teerminal/constants"
 	"teerminal/service/encryption"
@@ -89,7 +91,11 @@ func HandleSignWithAppDerivedKey(c *gin.Context) {
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(400, ErrorResponse{Error: constants.MsgErrorFailedToBindRequest})
 	}
-	data := []byte(req.Data)
+	// Decode hex string to byte array
+	data, err := hex.DecodeString(strings.TrimPrefix(req.Data, "0x"))
+	if err != nil {
+		c.JSON(400, ErrorResponse{Error: constants.MsgErrorFailedDecodeMessage})
+	}
 	signature, _ := encryption.Sign(data, appKey)
 	resp := SignResponse{
 		PubKey:    fmt.Sprintf("%x", appPublicKey),

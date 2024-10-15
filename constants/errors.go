@@ -4,6 +4,7 @@ import "errors"
 
 const (
 	MsgErrorFailedDecodePrivateKey = "failed to decode private key"
+	MsgErrorFailedDecodeMessage    = "failed to decode message"
 
 	MsgErrorMissingRemoteAttestation         = "missing remote attestation"
 	MsgErrorFailedHexDecodeRemoteAttestation = "failed to hex decode remote attestation"
