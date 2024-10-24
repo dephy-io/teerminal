@@ -31,9 +31,9 @@ definitions:
     type: object
   web.Enrollment:
     properties:
-      deadline:
-        type: string
       deviceKey:
+        type: string
+      payload:
         type: string
       signature:
         type: string

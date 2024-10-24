@@ -15,7 +15,7 @@ import (
 
 type Enrollment struct {
 	DeviceKey string `json:"deviceKey"`
-	Payload   string `json:"deadline"`
+	Payload   string `json:"payload"`
 	Signature string `json:"signature"`
 }
 

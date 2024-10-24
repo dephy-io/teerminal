@@ -374,10 +374,10 @@ const docTemplate = `{
         "web.Enrollment": {
             "type": "object",
             "properties": {
-                "deadline": {
+                "deviceKey": {
                     "type": "string"
                 },
-                "deviceKey": {
+                "payload": {
                     "type": "string"
                 },
                 "signature": {
