@@ -62,7 +62,7 @@ func GenerateCert(prover []byte, derivation []byte) (cert []byte) {
 	// Remove first byte (0x04)
 	derivedPublicKey = derivedPublicKey[1:]
 	// Concatenate derivation seed and public key
-	concatenated := append(derived, derivedPublicKey...)
+	concatenated := append(derivationBuffer, derivedPublicKey...)
 	// Sign the certificate
 	sig, _ := Sign(prover, concatenated)
 	// Get Patent Public Key
@@ -112,7 +112,7 @@ func GetDeviceRootCert() (cert []byte) {
 	derivedPublic := derivedPrivate.PubKey()
 	derivedPublicKey := derivedPublic.SerializeUncompressed()
 	derivedPublicKey = derivedPublicKey[1:]
-	concatenated := append(derived, derivedPublicKey...)
+	concatenated := append(derivation, derivedPublicKey...)
 	sig, _ := Sign(prover, concatenated)
 	proverPublic := secp256k1.PrivKeyFromBytes(prover).PubKey()
 	proverPublicKey := proverPublic.SerializeUncompressed()
